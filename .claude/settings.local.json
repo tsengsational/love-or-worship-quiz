@@ -14,7 +14,13 @@
       "WebFetch(domain:www.sade.com)",
       "WebFetch(domain:www.letras.com)",
       "WebFetch(domain:www.worshiptogether.com)",
-      "WebFetch(domain:mojim.com)"
+      "WebFetch(domain:mojim.com)",
+      "Bash(curl -s \"https://www.youtube.com/results?search_query=Sade+Your+Love+is+King+official+VEVO\" -A \"Mozilla/5.0\")",
+      "WebFetch(domain:www.lyrics.com)",
+      "WebFetch(domain:www.musixmatch.com)",
+      "WebFetch(domain:songmeanings.com)",
+      "WebFetch(domain:lyricsfreak.com)",
+      "WebFetch(domain:www.lyrics.net)"
     ]
   }
 }

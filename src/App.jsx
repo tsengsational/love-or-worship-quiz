@@ -475,7 +475,7 @@ export default function App() {
   const question = questions[currentIndex];
 
   function handleStart() {
-    setQuestions(shuffle(QUESTIONS));
+    setQuestions(shuffle(QUESTIONS).slice(0, 10));
     setScreen('game');
   }
 
