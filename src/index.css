@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --c-void:       oklch(8% 0.02 280);
+    --c-surface:    oklch(14% 0.025 285);
+    --c-surface-hi: oklch(20% 0.03 282);
+    --c-rim:        oklch(28% 0.04 285);
+    --c-gold:       oklch(74% 0.13 82);
+    --c-gold-dim:   oklch(62% 0.1 82);
+    --c-ink:        oklch(92% 0.012 80);
+    --c-ink-dim:    oklch(70% 0.018 80);
+    --c-worship:    oklch(72% 0.18 307);
+    --c-love:       oklch(70% 0.19 15);
+    --c-right:      oklch(78% 0.15 145);
+    --c-wrong:      oklch(68% 0.18 22);
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  html {
+    background-color: var(--c-void);
+    color: var(--c-ink);
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  /* Film-grain noise overlay via inline SVG filter */
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.038;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    mix-blend-mode: overlay;
+  }
+
+  /* Staggered animation delays */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+}

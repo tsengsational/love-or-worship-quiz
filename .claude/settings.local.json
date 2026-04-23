@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173,5174 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalPort, OwningProcess | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host \"Killed PID $\\($_.OwningProcess\\) on port $\\($_.LocalPort\\)\" })",
+      "WebSearch",
+      "WebFetch(domain:www.youtube.com)",
+      "WebFetch(domain:genius.com)",
+      "WebFetch(domain:www.azlyrics.com)",
+      "WebFetch(domain:www.songfacts.com)",
+      "WebFetch(domain:www.psalmnote.com)",
+      "WebFetch(domain:lyricstranslate.com)",
+      "WebFetch(domain:www.newreleasetoday.com)",
+      "WebFetch(domain:www.sade.com)",
+      "WebFetch(domain:www.letras.com)",
+      "WebFetch(domain:www.worshiptogether.com)",
+      "WebFetch(domain:mojim.com)"
+    ]
+  }
+}
