@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import QUESTIONS from './questions.json';
 
 function shuffle(arr) {
@@ -232,52 +232,57 @@ function GameScreen({ question, index, total, score, onAnswer, showAnswer, selec
       </div>
 
       {/* ── Answer buttons or Feedback ── */}
-      <div className="max-w-lg mx-auto w-full mt-6 space-y-3 pb-8 animate-fade-up delay-300">
-        {!showAnswer && (
-          <>
-            <AnswerButton
-              label="Worship"
-              icon="✞"
-              accentVar="--c-worship"
-              bgBase="oklch(12% 0.04 307)"
-              borderBase="oklch(38% 0.12 307 / 0.45)"
-              glowBase="oklch(55% 0.22 307 / 0.1)"
-              onClick={() => onAnswer('Worship')}
-            />
-            <AnswerButton
-              label="Love Song"
-              icon="♥"
-              accentVar="--c-love"
-              bgBase="oklch(12% 0.04 15)"
-              borderBase="oklch(38% 0.14 15 / 0.45)"
-              glowBase="oklch(52% 0.24 15 / 0.1)"
-              onClick={() => onAnswer('Love Song')}
-            />
-          </>
-        )}
+      <div className="max-w-lg mx-auto w-full mt-6 pb-8 relative animate-fade-up delay-300">
+        {/* Answer buttons - hidden when answer is shown */}
+        <div className={`space-y-3 transition-opacity duration-300 ${showAnswer ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          {!showAnswer && (
+            <>
+              <AnswerButton
+                label="Worship"
+                icon="✞"
+                accentVar="--c-worship"
+                bgBase="oklch(12% 0.04 307)"
+                borderBase="oklch(38% 0.12 307 / 0.45)"
+                glowBase="oklch(55% 0.22 307 / 0.1)"
+                onClick={() => onAnswer('Worship')}
+              />
+              <AnswerButton
+                label="Love Song"
+                icon="♥"
+                accentVar="--c-love"
+                bgBase="oklch(12% 0.04 15)"
+                borderBase="oklch(38% 0.14 15 / 0.45)"
+                glowBase="oklch(52% 0.24 15 / 0.1)"
+                onClick={() => onAnswer('Love Song')}
+              />
+            </>
+          )}
+        </div>
 
-        {showAnswer && (
-          <div className="space-y-3 animate-slide-up">
-            <FeedbackBanner
-              isCorrect={isCorrect}
-              question={question}
-              selectedAnswer={selectedAnswer}
-            />
-            <button
-              onClick={onNext}
-              className="w-full rounded-lg font-body font-medium uppercase tracking-widest text-void transition-transform duration-200 hover:scale-[1.02] active:scale-[0.97]"
-              style={{
-                padding: '1rem',
-                fontSize: '0.72rem',
-                letterSpacing: '0.2em',
-                background: 'var(--c-gold)',
-                boxShadow: '0 0 0 1px oklch(74% 0.13 82 / 0.25), 0 6px 20px oklch(74% 0.13 82 / 0.18)',
-              }}
-            >
-              {isLast ? 'See Results' : 'Next →'}
-            </button>
-          </div>
-        )}
+        {/* Feedback area - always mounted to lazy load the video, but hidden until needed */}
+        <div 
+          className={`w-full space-y-3 transition-all duration-500 ${showAnswer ? 'relative opacity-100 translate-y-0' : 'absolute top-0 left-0 opacity-0 pointer-events-none translate-y-4 invisible h-0 overflow-hidden'}`}
+          aria-hidden={!showAnswer}
+        >
+          <FeedbackBanner
+            show={showAnswer}
+            isCorrect={isCorrect}
+            question={question}
+          />
+          <button
+            onClick={onNext}
+            className="w-full rounded-lg font-body font-medium uppercase tracking-widest text-void transition-transform duration-200 hover:scale-[1.02] active:scale-[0.97]"
+            style={{
+              padding: '1rem',
+              fontSize: '0.72rem',
+              letterSpacing: '0.2em',
+              background: 'var(--c-gold)',
+              boxShadow: '0 0 0 1px oklch(74% 0.13 82 / 0.25), 0 6px 20px oklch(74% 0.13 82 / 0.18)',
+            }}
+          >
+            {isLast ? 'See Results' : 'Next →'}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -304,16 +309,35 @@ function AnswerButton({ label, icon, accentVar, bgBase, borderBase, glowBase, on
   );
 }
 
-function FeedbackBanner({ isCorrect, question }) {
+function FeedbackBanner({ isCorrect, question, show }) {
+  const iframeRef = useRef(null);
   const bgColor    = isCorrect ? 'oklch(16% 0.04 145)' : 'oklch(14% 0.04 22)';
   const rimColor   = isCorrect ? 'oklch(42% 0.14 145 / 0.5)' : 'oklch(42% 0.18 22 / 0.5)';
   const labelColor = isCorrect ? 'var(--c-right)' : 'var(--c-wrong)';
 
-  const embedSrc = `https://www.youtube-nocookie.com/embed/${question.youtubeId}?start=${question.timestamp}&autoplay=1&rel=0&modestbranding=1`;
+  // We use enablejsapi=1 to allow postMessage control without reloading the iframe
+  const embedSrc = `https://www.youtube-nocookie.com/embed/${question.youtubeId}?start=${question.timestamp}&rel=0&modestbranding=1&enablejsapi=1`;
+
+  useEffect(() => {
+    if (show && iframeRef.current) {
+      const playVideo = () => {
+        iframeRef.current?.contentWindow?.postMessage(
+          JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
+          '*'
+        );
+      };
+
+      // Attempt to play immediately
+      playVideo();
+      // Also attempt after a short delay to ensure the player is ready
+      const timer = setTimeout(playVideo, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [show]);
 
   return (
     <div
-      className="rounded-lg overflow-hidden text-center"
+      className="rounded-lg overflow-hidden text-center transition-colors duration-500"
       style={{ background: bgColor, border: `1px solid ${rimColor}` }}
       role="alert"
     >
@@ -349,6 +373,7 @@ function FeedbackBanner({ isCorrect, question }) {
       {/* YouTube embed — 16:9, starts at the lyric's timestamp */}
       <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
         <iframe
+          ref={iframeRef}
           key={question.youtubeId}
           src={embedSrc}
           title={`${question.song} by ${question.artist}`}
@@ -370,7 +395,8 @@ function FeedbackBanner({ isCorrect, question }) {
 
 // ─── EndScreen ───────────────────────────────────────────────────────────────
 
-function EndScreen({ score, total, onRestart }) {
+function EndScreen({ score, total, results, onRestart }) {
+  const [copied, setCopied] = useState(false);
   const pct = Math.round((score / total) * 100);
 
   const message =
@@ -379,6 +405,20 @@ function EndScreen({ score, total, onRestart }) {
     pct >= 60   ? "Not bad — the lines blur for a reason." :
     pct >= 40   ? "The ambiguity got you. As intended." :
                   "Perhaps that's the whole point.";
+
+  const handleShare = () => {
+    const grid = results.map(r => r ? '🟩' : '🟥').join('');
+    const text = `Worship or Love Song?
+Score: ${score}/${total}
+${grid}
+
+Play at: https://love-or-worship.netlify.app`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 py-16 text-center">
@@ -426,8 +466,24 @@ function EndScreen({ score, total, onRestart }) {
 
         {/* CTA block */}
         <div className="mt-10 space-y-3 animate-fade-up delay-300">
+          <button
+            onClick={handleShare}
+            className="flex items-center justify-center gap-2 w-full rounded-xl font-body font-semibold text-void transition-all duration-250 hover:scale-[1.02] active:scale-[0.97]"
+            style={{
+              padding: '1.25rem 1.5rem',
+              fontSize: '0.92rem',
+              lineHeight: 1.3,
+              background: 'var(--c-gold)',
+              boxShadow: '0 8px 32px oklch(74% 0.13 82 / 0.2), inset 0 1px 0 oklch(100% 0 0 / 0.1)',
+            }}
+          >
+            {copied ? '✓ Copied!' : 'Share Results'}
+          </button>
+
           <a
-            href="#"
+            href="https://www.fearandwonder.nyc"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full rounded-xl font-body font-semibold text-ink transition-all duration-250 hover:scale-[1.02] hover:brightness-110 active:scale-[0.97]"
             style={{
               padding: '1.25rem 1.5rem',
@@ -445,7 +501,6 @@ function EndScreen({ score, total, onRestart }) {
             >
               Fear &amp; Wonder
             </span>
-            <span>in NYC</span>
             <span className="text-gold opacity-60" aria-hidden="true">→</span>
           </a>
 
@@ -470,19 +525,23 @@ export default function App() {
   const [currentIndex, setCurrentIndex]   = useState(0);
   const [score, setScore]                 = useState(0);
   const [showAnswer, setShowAnswer]       = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [results, setResults]               = useState([]);
 
   const question = questions[currentIndex];
 
   function handleStart() {
     setQuestions(shuffle(QUESTIONS).slice(0, 10));
+    setResults([]);
     setScreen('game');
   }
 
   function handleAnswer(category) {
+    const isCorrect = category === question.category;
     setSelectedAnswer(category);
     setShowAnswer(true);
-    if (category === question.category) {
+    setResults((prev) => [...prev, isCorrect]);
+    if (isCorrect) {
       setScore((s) => s + 1);
     }
   }
@@ -497,11 +556,12 @@ export default function App() {
     }
   }
 
-  function handleRestart() {
+   function handleRestart() {
     setScreen('start');
     setQuestions(QUESTIONS);
     setCurrentIndex(0);
     setScore(0);
+    setResults([]);
     setShowAnswer(false);
     setSelectedAnswer(null);
   }
@@ -537,6 +597,7 @@ export default function App() {
           <EndScreen
             score={score}
             total={questions.length}
+            results={results}
             onRestart={handleRestart}
           />
         )}
