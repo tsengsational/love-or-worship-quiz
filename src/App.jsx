@@ -397,6 +397,7 @@ function FeedbackBanner({ isCorrect, question, show }) {
 
 function EndScreen({ score, total, results, onRestart }) {
   const [copied, setCopied] = useState(false);
+  const [showCopiedText, setShowCopiedText] = useState(false);
   const pct = Math.round((score / total) * 100);
 
   const message =
@@ -406,16 +407,17 @@ function EndScreen({ score, total, results, onRestart }) {
     pct >= 40   ? "The ambiguity got you. As intended." :
                   "Perhaps that's the whole point.";
 
-  const handleShare = () => {
-    const grid = results.map(r => r ? '🟩' : '🟥').join('');
-    const text = `Worship or Love Song?
+  const grid = results.map(r => r ? '🟩' : '🟥').join('');
+  const shareText = `Worship or Love Song?
 Score: ${score}/${total}
 ${grid}
 
 Play at: https://love-or-worship.netlify.app`;
 
-    navigator.clipboard.writeText(text).then(() => {
+  const handleShare = () => {
+    navigator.clipboard.writeText(shareText).then(() => {
       setCopied(true);
+      setShowCopiedText(true);
       setTimeout(() => setCopied(false), 2000);
     });
   };
@@ -479,6 +481,23 @@ Play at: https://love-or-worship.netlify.app`;
           >
             {copied ? '✓ Copied!' : 'Share Results'}
           </button>
+
+          {showCopiedText && (
+            <div
+              className="w-full rounded-xl p-4 text-left animate-fade-in"
+              style={{
+                background: 'var(--c-surface)',
+                border: '1px solid var(--c-rim)',
+              }}
+            >
+              <pre
+                className="font-body text-ink-dim whitespace-pre-wrap"
+                style={{ fontSize: '0.8rem', lineHeight: 1.5, fontFamily: 'inherit' }}
+              >
+                {shareText}
+              </pre>
+            </div>
+          )}
 
           <a
             href="https://www.fearandwonder.nyc"
