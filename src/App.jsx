@@ -260,7 +260,7 @@ function GameScreen({ question, index, total, score, onAnswer, showAnswer, selec
         </div>
 
         {/* Feedback area - always mounted to lazy load the video, but hidden until needed */}
-        <div 
+        <div
           className={`w-full space-y-3 transition-all duration-500 ${showAnswer ? 'relative opacity-100 translate-y-0' : 'absolute top-0 left-0 opacity-0 pointer-events-none translate-y-4 invisible h-0 overflow-hidden'}`}
           aria-hidden={!showAnswer}
         >
@@ -311,8 +311,8 @@ function AnswerButton({ label, icon, accentVar, bgBase, borderBase, glowBase, on
 
 function FeedbackBanner({ isCorrect, question, show }) {
   const iframeRef = useRef(null);
-  const bgColor    = isCorrect ? 'oklch(16% 0.04 145)' : 'oklch(14% 0.04 22)';
-  const rimColor   = isCorrect ? 'oklch(42% 0.14 145 / 0.5)' : 'oklch(42% 0.18 22 / 0.5)';
+  const bgColor = isCorrect ? 'oklch(16% 0.04 145)' : 'oklch(14% 0.04 22)';
+  const rimColor = isCorrect ? 'oklch(42% 0.14 145 / 0.5)' : 'oklch(42% 0.18 22 / 0.5)';
   const labelColor = isCorrect ? 'var(--c-right)' : 'var(--c-wrong)';
 
   // We use enablejsapi=1 to allow postMessage control without reloading the iframe
@@ -402,10 +402,10 @@ function EndScreen({ score, total, results, onRestart }) {
 
   const message =
     pct === 100 ? "Perfect score. You're uncanny." :
-    pct >= 80   ? "Sharp ears. Well done." :
-    pct >= 60   ? "Not bad — the lines blur for a reason." :
-    pct >= 40   ? "The ambiguity got you. As intended." :
-                  "Perhaps that's the whole point.";
+      pct >= 80 ? "Sharp ears. Well done." :
+        pct >= 60 ? "Not bad — the lines blur for a reason." :
+          pct >= 40 ? "The ambiguity got you. As intended." :
+            "Perhaps that's the whole point.";
 
   const grid = results.map(r => r ? '🟩' : '🟥').join('');
   const shareText = `Worship or Love Song?
@@ -500,7 +500,7 @@ Play at: https://love-or-worship.netlify.app`;
           )}
 
           <a
-            href="https://www.fearandwonder.nyc"
+            href="https://www.fluxtheatre.org/productions/fear-wonder"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full rounded-xl font-body font-semibold text-ink transition-all duration-250 hover:scale-[1.02] hover:brightness-110 active:scale-[0.97]"
@@ -539,13 +539,13 @@ Play at: https://love-or-worship.netlify.app`;
 // ─── Root App ────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [screen, setScreen]               = useState('start');
-  const [questions, setQuestions]         = useState(QUESTIONS);
-  const [currentIndex, setCurrentIndex]   = useState(0);
-  const [score, setScore]                 = useState(0);
-  const [showAnswer, setShowAnswer]       = useState(false);
-   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [results, setResults]               = useState([]);
+  const [screen, setScreen] = useState('start');
+  const [questions, setQuestions] = useState(QUESTIONS);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [results, setResults] = useState([]);
 
   const question = questions[currentIndex];
 
@@ -575,7 +575,7 @@ export default function App() {
     }
   }
 
-   function handleRestart() {
+  function handleRestart() {
     setScreen('start');
     setQuestions(QUESTIONS);
     setCurrentIndex(0);
